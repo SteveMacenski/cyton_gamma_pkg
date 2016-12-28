@@ -1,0 +1,219 @@
+import sys
+from sensor_msgs.msg import JointState
+import copy
+import rospy
+from std_msgs.msg import Float64
+import moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
+import PyQt4
+import tf
+from math import degrees, radians
+import rviz
+
+class CytonMotion():
+
+
+    def __init__(self):
+        #initalize ROS node, MoveIt Commander, and publishers
+
+        moveit_commander.roscpp_initialize(sys.argv)
+
+        self.robot = moveit_commander.RobotCommander()
+        self.scene = moveit_commander.PlanningSceneInterface()
+        self.group = moveit_commander.MoveGroupCommander(
+                            "manipulator_planning_group")
+        self.group.set_goal_position_tolerance(0.001)
+        self.group.set_goal_orientation_tolerance(0.01)
+        self.group.allow_replanning(True)
+        self.display_trajectory_publisher = rospy.Publisher(
+                '/move_group/display_planned_path',
+                moveit_msgs.msg.DisplayTrajectory,queue_size=10)
+        self.group.set_end_effector_link(
+                            "wrist_roll")
+        self.gripper_publisher = rospy.Publisher(
+                '/gripper_position_controller/command',
+                Float64,queue_size=10)
+
+
+    def visualize(self,plan):
+        #to visualize trajectory in RVIZ window
+
+        display_trajectory = moveit_msgs.msg.DisplayTrajectory()
+        display_trajectory.trajectory_start = \
+                                  self.robot.get_current_state()
+        display_trajectory.trajectory.append(plan)
+        display_trajectory_publisher.publish(display_trajectory)
+
+
+    def moveCartesian(self, orientation, pose, execute):
+        #move cartesian coordinates
+
+        self.group.clear_pose_targets()
+
+        #cartesian motion
+        waypoints = []
+
+        # get
+        waypoints.append(self.group.get_current_pose().pose)
+
+        # set
+        quaternion = tf.transformations.quaternion_from_euler(
+               orientation[0], orientation[1], orientation[2])
+        wpose = geometry_msgs.msg.Pose()
+        wpose.orientation.x = quaternion[0]
+        wpose.orientation.y = quaternion[1]
+        wpose.orientation.z = quaternion[2]
+        wpose.orientation.w = quaternion[3]
+        wpose.position.x = pose[0]
+        wpose.position.y = pose[1]
+        wpose.position.z = pose[2]
+        waypoints.append(copy.deepcopy(wpose))
+
+        (plan, fraction) = self.group.compute_cartesian_path(
+                             waypoints,   # waypoints to follow
+                             0.01,        # eef_step
+                             0.0)         # jump_threshold
+
+        try:
+            if execute:
+                self.group.execute(plan)
+            else:
+                self.stored_plan = plan
+        except:
+            print "plan could not be executed"
+
+
+    def deltaMoveCartesian(self, orientation, pose, execute):
+        #move in a delta move, or change in position movement cartesian
+
+        self.group.clear_pose_targets()
+        #cartesian motion
+        waypoints = []
+
+        # get
+        waypoints.append(self.group.get_current_pose().pose)
+
+        # set
+        quaternion = tf.transformations.quaternion_from_euler(
+               orientation[0], orientation[1], orientation[2])
+        wpose = geometry_msgs.msg.Pose()
+        wpose.orientation.x = quaternion[0]
+        wpose.orientation.y = quaternion[1]
+        wpose.orientation.z = quaternion[2]
+        wpose.orientation.w = quaternion[3]
+        wpose.position.x = pose[0]
+        wpose.position.y = pose[1]
+        wpose.position.z = pose[2]
+        waypoints.append(copy.deepcopy(wpose))
+
+        (plan, fraction) = self.group.compute_cartesian_path(
+                             waypoints,   # waypoints to follow
+                             0.01,        # eef_step
+                             0.0)         # jump_threshold
+        try:
+            if execute:
+                self.group.execute(plan)
+            else:
+                self.stored_plan = plan
+        except:
+            print "plan could not be executed"
+
+
+    def moveJoint(self, angles, execute):
+        #plan a joint space motion 
+
+        self.group.clear_pose_targets()
+
+        if len(angles) > 5:
+            #get
+            group_variable_values = \
+                   self.group.get_current_joint_values()
+
+            #set
+            group_variable_values[0] = angles[0]
+            group_variable_values[1] = angles[1]
+            group_variable_values[2] = angles[2]
+            group_variable_values[3] = angles[3]
+            group_variable_values[4] = angles[4]
+            group_variable_values[5] = angles[5]
+            group_variable_values[6] = angles[6]
+
+            self.group.set_joint_value_target(
+                        group_variable_values)
+
+        else:
+
+            #sets
+            pose_target = geometry_msgs.msg.Pose()
+            pose_target.orientation.w = angles[0]
+            pose_target.position.x = angles[1]
+            pose_target.position.y = angles[2]
+            pose_target.position.z = angles[3]
+            self.group.set_pose_target(pose_target)
+
+        plan = self.group.plan()
+
+        try:
+            plan = self.group.plan()
+            if execute:
+                self.group.execute(plan)
+            else:
+                self.stored_plan = plan
+        except:
+            print "plan could not be executed"
+
+
+    def deltaMoveJoint(self,angles, execute):
+        #plan a delta joint space motion, or change in joint angles
+
+        self.group.clear_pose_targets()
+
+        if len(angles) > 5:
+            #get
+            group_variable_values = \
+             self.group.get_current_joint_values()
+
+            #set
+            group_variable_values[0] += angles[0]
+            group_variable_values[1] += angles[1]
+            group_variable_values[2] += angles[2]
+            group_variable_values[3] += angles[3]
+            group_variable_values[4] += angles[4]
+            group_variable_values[5] += angles[5]
+            group_variable_values[6] += angles[6]
+
+            self.group.set_joint_value_target(
+                        group_variable_values)
+
+        else:
+
+            #sets
+            pose_target = geometry_msgs.msg.Pose()
+            pose_target.orientation.w = angles[0]
+            pose_target.position.x += angles[1]
+            pose_target.position.y += angles[2]
+            pose_target.position.z += angles[3]
+            self.group.set_pose_target(pose_target)
+
+        try:
+            plan = self.group.plan()
+            if execute:
+                self.group.execute(plan)
+            else:
+                self.stored_plan = plan
+        except:
+            print "plan could not be executed"
+
+
+    def executePath(self):
+        #execute this path generated when not executed on planning
+
+        self.group.execute(self.stored_plan);
+
+
+    def moveGripper(self, move):
+        #publish command to gripper to move [-.5 1.9]
+
+        self.gripper_publisher.publish(move)
+
