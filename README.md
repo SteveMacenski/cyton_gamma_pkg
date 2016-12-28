@@ -12,7 +12,7 @@ This will launch a simulation environment in RVIZ and Gazebo
 
 This is an edited version of the ROS-I generated file. It is tuned with removed parts not relavent for my implementation. Additional parameters were added for hardware execution. 
 
-The remaining files, _gaz and _rviz support the simulation package. 
+The remaining files, _gaz and _rviz support the simulation package. controllers.yaml in the index of the directory are for the simulation environment for Gazebo.
 
 ## cyton_gamma_pkg/src
 Here are the python tests of a trajectory generation program, front-end, and path planning class utilizing OMPL and MoveIt.
