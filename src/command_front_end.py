@@ -72,9 +72,9 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.planButtonL.move(20, 300)  
         self.planButtonL.clicked.connect(self.planLF)
 
-        self.Gripbutton = PyQt4.QtGui.QPushButton('Move Gripper\n[-0.5 1.9]', self)
+        self.Gripbutton = PyQt4.QtGui.QPushButton('Move Gripper\n1500: [-0.5 1.9]\n300: [-0.6-.7]', self)
         self.Gripbutton.setToolTip('Close Grippers')
-        self.Gripbutton.resize(180,60)
+        self.Gripbutton.resize(180,80)
         self.Gripbutton.move(20, 380)  
         self.Gripbutton.clicked.connect(self.moveGripper)
 
