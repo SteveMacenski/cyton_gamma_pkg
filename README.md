@@ -26,3 +26,7 @@ Will attempt to launch all of the launch scripts for a full launch making it eas
 Will launch the front-end with accompanying OMPL/MoveIt planning backend class in robot_planning_class.py. 
 
 test_traj.py shows how to fill out the trajectory_msgs JointTrajectory type in python and submit those commands directly to hardware. This allows you to bypass a planning node and is independent of OMPL, requiring only a connection to the hardware. 
+
+## Robot Operations
+For full instructions see SteveMacenski/cyton_gamma_300-1500_operation_and_simulation
+https://github.com/SteveMacenski/cyton_gamma_300-1500_operation_and_simulation
