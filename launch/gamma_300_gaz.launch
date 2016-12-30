@@ -4,12 +4,12 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch" />
 
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
-        args="-param robot_description -urdf -model cyton_gamma_300" />
+        args="-param robot_description -urdf -model cyton_gamma_300.urdf" />
 
-  <rosparam file="$(find cyton_gamma_pkg)/controllers.yaml" command="load"/>
+  <rosparam file="$(find cyton_gamma_pkg)/controllers_300.yaml" command="load"/>
 
   <node name="controller_spawner" pkg="controller_manager" type="spawner"
-        args="cyton_joint_trajectory_action_controller gripper_planning_group_controller"/>
+        args="cyton_joint_trajectory_action_controller"/>
 
   <node name="robot_state_publisher" pkg="robot_state_publisher"
         type="robot_state_publisher"/>
