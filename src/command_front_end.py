@@ -39,8 +39,8 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.init_labels()
         self.init_fields()
         
-        self.setGeometry(500, 500, 330, 500)
-        self.setWindowTitle('Cyton ROS Command Center')    
+        self.setGeometry(500, 500, 240, 500)
+        self.setWindowTitle('Command Center')    
         self.show()
 
     def init_buttons(self):
@@ -98,10 +98,6 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         JointLab.move(150,0)
         JointLab.resize(60,20)
 
-        statusLab = PyQt4.QtGui.QLabel('  Current',self)
-        statusLab.move(250,0)
-        statusLab.resize(60,20)
-
         inputXLab = PyQt4.QtGui.QLabel('X',self)
         inputXLab.move(10,20)
         inputXLab.resize(60,30)
@@ -112,46 +108,6 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
 
         inputZLab = PyQt4.QtGui.QLabel('Z',self)
         inputZLab.move(10,80)
-        inputZLab.resize(60,30)
-
-        inputXLab = PyQt4.QtGui.QLabel('    X',self)
-        inputXLab.move(220,280)
-        inputXLab.resize(60,30)
-
-        inputYLab = PyQt4.QtGui.QLabel('    Y',self)
-        inputYLab.move(220,310)
-        inputYLab.resize(60,30)
-
-        inputZLab = PyQt4.QtGui.QLabel('    Z',self)
-        inputZLab.move(220,340)
-        inputZLab.resize(60,30)
-
-        inputXLab = PyQt4.QtGui.QLabel('  J1',self)
-        inputXLab.move(220,20)
-        inputXLab.resize(60,30)
-
-        inputYLab = PyQt4.QtGui.QLabel('  J2',self)
-        inputYLab.move(220,50)
-        inputYLab.resize(60,30)
-
-        inputZLab = PyQt4.QtGui.QLabel('  J3',self)
-        inputZLab.move(220,80)
-        inputZLab.resize(60,30)
-
-        inputXLab = PyQt4.QtGui.QLabel('  J4',self)
-        inputXLab.move(220,110)
-        inputXLab.resize(60,30)
-
-        inputYLab = PyQt4.QtGui.QLabel('  J5',self)
-        inputYLab.move(220,140)
-        inputYLab.resize(60,30)
-
-        inputZLab = PyQt4.QtGui.QLabel('  J6',self)
-        inputZLab.move(220,170)
-        inputZLab.resize(60,30)
-
-        inputZLab = PyQt4.QtGui.QLabel('  J7',self)
-        inputZLab.move(220,200)
         inputZLab.resize(60,30)
 
         inputXLab = PyQt4.QtGui.QLabel('J1',self)
@@ -197,19 +153,6 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         inputRZLab = PyQt4.QtGui.QLabel('RotZ',self)
         inputRZLab.move(10,180)
         inputRZLab.resize(60,30)
-
-        inputRXLab = PyQt4.QtGui.QLabel('RotX',self)
-        inputRXLab.move(210,385)
-        inputRXLab.resize(60,20)
-
-        inputRYLab = PyQt4.QtGui.QLabel('RotY',self)
-        inputRYLab.move(210,385+30)
-        inputRYLab.resize(60,30)
-
-        inputRZLab = PyQt4.QtGui.QLabel('RotZ',self)
-        inputRZLab.move(210,385+60)
-        inputRZLab.resize(60,30)
-
 
     def init_fields(self):
         #initialize all the fields and locations
@@ -268,93 +211,6 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.inputRG = PyQt4.QtGui.QLineEdit(self)
         self.inputRG.move(150,240)
         self.inputRG.resize(60,30)
-
-        self.currentR1 = PyQt4.QtGui.QLineEdit(self)
-        self.currentR1.move(250,20)
-        self.currentR1.resize(60,30)
-
-        self.currentR2 = PyQt4.QtGui.QLineEdit(self)
-        self.currentR2.move(250,50)
-        self.currentR2.resize(60,30)
-
-        self.currentR3 = PyQt4.QtGui.QLineEdit(self)
-        self.currentR3.move(250,80)
-        self.currentR3.resize(60,30)
-
-        self.currentR4 = PyQt4.QtGui.QLineEdit(self)
-        self.currentR4.move(250,110)
-        self.currentR4.resize(60,30)
-
-        self.currentR5 = PyQt4.QtGui.QLineEdit(self)
-        self.currentR5.move(250,140)
-        self.currentR5.resize(60,30)
-
-        self.currentR6 = PyQt4.QtGui.QLineEdit(self)
-        self.currentR6.move(250,170)
-        self.currentR6.resize(60,30)
-
-        self.currentR7 = PyQt4.QtGui.QLineEdit(self)
-        self.currentR7.move(250,200)
-        self.currentR7.resize(60,30)
-
-        self.currentX = PyQt4.QtGui.QLineEdit(self)
-        self.currentX.move(250,280)
-        self.currentX.resize(60,30)
-
-        self.currentY = PyQt4.QtGui.QLineEdit(self)
-        self.currentY.move(250,310)
-        self.currentY.resize(60,30)
-
-        self.currentZ = PyQt4.QtGui.QLineEdit(self)
-        self.currentZ.move(250,340)
-        self.currentZ.resize(60,30)
-
-        self.currentRotX = PyQt4.QtGui.QLineEdit(self)
-        self.currentRotX.move(250,380)
-        self.currentRotX.resize(60,30)
-
-        self.currentRotY = PyQt4.QtGui.QLineEdit(self)
-        self.currentRotY.move(250,410)
-        self.currentRotY.resize(60,30)
-
-        self.currentRotZ = PyQt4.QtGui.QLineEdit(self)
-        self.currentRotZ.move(250,440)
-        self.currentRotZ.resize(60,30)
-
-
-    def CytonStateUpdate(self, JState):
-        #update current robot state
-        states = JState.position
-        self.currentR1.setText(str(round(degrees(states[4]),2)))
-        self.currentR2.setText(str(round(degrees(states[0]),2)))
-        self.currentR3.setText(str(round(degrees(states[6]),2)))
-        self.currentR4.setText(str(round(degrees(states[5]),2)))
-        self.currentR5.setText(str(round(degrees(states[3]),2)))
-        self.currentR6.setText(str(round(degrees(states[1]),2)))
-        self.currentR7.setText(str(round(degrees(states[2]),2)))
-
-        self.clock+=1
-        #TODO, glitches the front end on update
-        #if self.clock % 5 == 0:
-        #    pose = self.action.group.get_current_pose().pose
-
-        #    self.currentX.setText(str(round(pose.position.x,2)))
-        #    self.currentY.setText(str(round(pose.position.y,2)))
-        #    self.currentZ.setText(str(round(pose.position.z,2)))
-
-        #    quaternion = (
-        #        pose.orientation.x,
-        #        pose.orientation.y,
-        #        pose.orientation.z,
-        #        pose.orientation.w)
-        #    Euler = tf.transformations.euler_from_quaternion(
-        #                                       quaternion)
-        #    self.currentRotX.setText(str(round(
-        #                             degrees(Euler[0]),2)))
-        #    self.currentRotY.setText(str(round(
-        #                             degrees(Euler[1]),2)))
-        #    self.currentRotZ.setText(str(round(
-        #                             degrees(Euler[2]),2)))
 
 
     def commandJF(self):

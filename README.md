@@ -21,9 +21,13 @@ Here are the python tests of a trajectory generation program, front-end, and pat
 
 Will attempt to launch all of the launch scripts for a full launch making it easier on the user. It currently has some bugs resulting in a 50% success rate. 
 
-> python command_front_end.py 
+> python command_front_end.py 2>/dev/null
 
 Will launch the front-end with accompanying OMPL/MoveIt planning backend class in robot_planning_class.py. 
+
+> python feedback_front_end.py 2>/dev/null
+
+Will launch the front-end with feedback information from the robot and E-STOP capabilities.
 
 test_traj.py shows how to fill out the trajectory_msgs JointTrajectory type in python and submit those commands directly to hardware. This allows you to bypass a planning node and is independent of OMPL, requiring only a connection to the hardware. 
 

@@ -10,6 +10,7 @@ import PyQt4
 import tf
 from math import degrees, radians
 import rviz
+from actionlib_msgs.msg import GoalID
 
 class CytonMotion():
 
@@ -34,6 +35,9 @@ class CytonMotion():
         self.gripper_publisher = rospy.Publisher(
                 '/gripper_position_controller/command',
                 Float64,queue_size=10)
+        self.traj_canceller = rospy.Publisher(
+                '/cyton_joint_trajectory_action_controller/follow_joint_trajectory/cancel',
+                GoalID,queue_size=10)
 
 
     def visualize(self,plan):
@@ -152,8 +156,6 @@ class CytonMotion():
             pose_target.position.z = angles[3]
             self.group.set_pose_target(pose_target)
 
-        plan = self.group.plan()
-
         try:
             plan = self.group.plan()
             if execute:
@@ -216,4 +218,9 @@ class CytonMotion():
         #publish command to gripper to move [-.5 1.9]
 
         self.gripper_publisher.publish(move)
+
+    def stopMotion(self):
+        #stops robot motion in execution
+        msg = GoalID()
+        self.traj_canceller.publish(msg)
 
