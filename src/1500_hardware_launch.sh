@@ -29,7 +29,7 @@ sleep 20
 
 echo "[5/6] start command front end"
 
-xterm -e python /home/rdtintern/catkin_ws/src/cyton_gamma_pkg/src/command_front_end.py 2> /dev/null &
+xterm -e python /home/rdtintern/catkin_ws/src/cyton_gamma_pkg/src/command_front_end.py 2> /dev/null 1500 &
 
 echo "[6/6] start feedback front end"
 
