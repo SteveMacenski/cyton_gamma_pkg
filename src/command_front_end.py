@@ -15,17 +15,24 @@ import robot_planning_class
 class CommandCenter(PyQt4.QtGui.QMainWindow):
 
     def __init__(self,parent=None):
+
+        # get input for specific robot
+        if len(sys.argv) > 1:
+            if sys.argv[1] == '300' or sys.argv[1] == '1500':
+                self.rob = sys.argv[1]
+            else:
+                print "Not a robot, please specify 300 or 1500"
+                sys.exit()
+        else:
+            print "No Robot specified, please specify 300 or 1500"
+            sys.exit()
+
         #make window and initialize ROS node
         PyQt4.QtGui.QWidget.__init__(self, parent)
         rospy.init_node('planning_background',
                     anonymous=True)
        
         self.init()
-        self.clock = 0
-        #self.state_subscriber = rospy.Subscriber(
-        #                          '/joint_states',
-        #                               JointState,
-        #                    self.CytonStateUpdate)
         self.action = robot_planning_class.CytonMotion()
 
 
@@ -72,7 +79,8 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.planButtonL.move(20, 300)  
         self.planButtonL.clicked.connect(self.planLF)
 
-        self.Gripbutton = PyQt4.QtGui.QPushButton('Move Gripper\n1500: [-0.5 1.9]\n300: [-0.6-.7]', self)
+        self.Gripbutton = PyQt4.QtGui.QPushButton('Move Gripper\n[0 100]', self)
+
         self.Gripbutton.setToolTip('Close Grippers')
         self.Gripbutton.resize(180,80)
         self.Gripbutton.move(20, 380)  
@@ -280,6 +288,13 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
     def moveGripper(self):
         #send command to the gripper task in the hardware
         move = float(self.inputRG.text())
+
+        if self.rob == '1500':
+            move = ((move/100.)*2.4)-.5
+        else:
+            move = ((move/100.)*1.3)-.6
+        print move
+
         self.action.moveGripper(move)
 
 

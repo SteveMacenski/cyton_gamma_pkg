@@ -9,15 +9,12 @@ import geometry_msgs.msg
 import PyQt4
 import tf
 from math import degrees, radians
-import rviz
 from actionlib_msgs.msg import GoalID
 
 class CytonMotion():
 
-
     def __init__(self):
         #initalize ROS node, MoveIt Commander, and publishers
-
         moveit_commander.roscpp_initialize(sys.argv)
 
         self.robot = moveit_commander.RobotCommander()
@@ -38,6 +35,7 @@ class CytonMotion():
         self.traj_canceller = rospy.Publisher(
                 '/cyton_joint_trajectory_action_controller/follow_joint_trajectory/cancel',
                 GoalID,queue_size=10)
+        self.velScale = 0.1
 
 
     def visualize(self,plan):
@@ -78,10 +76,11 @@ class CytonMotion():
                              waypoints,   # waypoints to follow
                              0.01,        # eef_step
                              0.0)         # jump_threshold
+        plan = self.timeParamzn(plan)
 
         try:
             if execute:
-                self.group.execute(plan)
+                self.group.execute(plan, wait=False)
             else:
                 self.stored_plan = plan
         except:
@@ -115,6 +114,8 @@ class CytonMotion():
                              waypoints,   # waypoints to follow
                              0.01,        # eef_step
                              0.0)         # jump_threshold
+        plan = self.timeParamzn(plan)
+
         try:
             if execute:
                 self.group.execute(plan)
@@ -156,14 +157,16 @@ class CytonMotion():
             pose_target.position.z = angles[3]
             self.group.set_pose_target(pose_target)
 
-        try:
+        if True:
             plan = self.group.plan()
+            plan = self.timeParamzn(plan)
+
             if execute:
-                self.group.execute(plan)
+                self.group.go(plan, wait=False)
             else:
                 self.stored_plan = plan
-        except:
-            print "plan could not be executed"
+        #except:
+        #    print "plan could not be executed"
 
 
     def deltaMoveJoint(self,angles, execute):
@@ -200,15 +203,16 @@ class CytonMotion():
 
         try:
             plan = self.group.plan()
+            plan = self.timeParamzn(plan)
             if execute:
-                self.group.execute(plan)
+                self.group.go(plan, wait=False)
             else:
                 self.stored_plan = plan
         except:
             print "plan could not be executed"
 
 
-    def executePath(self):
+    def executeStoredPath(self):
         #execute this path generated when not executed on planning
 
         self.group.execute(self.stored_plan);
@@ -217,10 +221,62 @@ class CytonMotion():
     def moveGripper(self, move):
         #publish command to gripper to move [-.5 1.9]
 
-        self.gripper_publisher.publish(move)
+        self.grvelScaleipper_publisher.publish(move)
+
 
     def stopMotion(self):
         #stops robot motion in execution
         msg = GoalID()
         self.traj_canceller.publish(msg)
+
+    def timeParamzn(self, plan):
+
+     print plan.joint_trajectory.points[-1]
+
+     new_traj = moveit_msgs.msg.RobotTrajectory()
+     new_traj.joint_trajectory = plan.joint_trajectory
+     n_joints = len(plan.joint_trajectory.joint_names)
+     n_points = len(plan.joint_trajectory.points)
+
+     spd = self.velScale
+
+     for i in range(n_points):
+         new_traj.joint_trajectory.points[i].time_from_start = \
+              plan.joint_trajectory.points[i].time_from_start / spd
+
+         new_traj.joint_trajectory.points[i].velocities = \
+            list(new_traj.joint_trajectory.points[i].velocities)
+
+         new_traj.joint_trajectory.points[i].accelerations = \
+             list(new_traj.joint_trajectory.points[i].accelerations)
+
+         new_traj.joint_trajectory.points[i].positions = \
+             list(new_traj.joint_trajectory.points[i].positions)
+
+         for j in range(n_joints):
+
+            new_traj.joint_trajectory.points[i].velocities[j] = \
+                plan.joint_trajectory.points[i].velocities[j] * spd
+            new_traj.joint_trajectory.points[i].accelerations[j] = \
+                plan.joint_trajectory.points[i].accelerations[j] * spd * spd
+            new_traj.joint_trajectory.points[i].positions[j] = \
+                plan.joint_trajectory.points[i].positions[j]
+
+         new_traj.joint_trajectory.points[i].velocities = \
+             tuple(new_traj.joint_trajectory.points[i].velocities)
+
+         new_traj.joint_trajectory.points[i].accelerations = \
+             tuple(new_traj.joint_trajectory.points[i].accelerations)
+
+         new_traj.joint_trajectory.points[i].positions = \
+             tuple(new_traj.joint_trajectory.points[i].positions)
+
+     print new_traj.joint_trajectory.points[-1]
+
+     return new_traj
+
+
+    def changeVelocityScaling(self, velScale):
+        self.velScale = velScale
+
 

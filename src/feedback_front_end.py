@@ -178,8 +178,8 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.currentR7.setText(str(round(degrees(states[2]),2)))
 
         self.clock+=1
-        #TODO, glitches the front end on update
-        if self.clock % 5 == 0:
+
+        if self.clock % 1 == 0:
             pose = self.action.group.get_current_pose().pose
 
             self.currentX.setText(str(round(pose.position.x,2)))
@@ -203,7 +203,6 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
 
 
     def stopMotion(self):
-        print "attempt stop"
         self.action.stopMotion()
 
 
