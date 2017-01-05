@@ -127,10 +127,10 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.planButtonL.move(235, 240)  
         self.planButtonL.clicked.connect(self.planLF)
 
-        self.Gripbutton = PyQt4.QtGui.QPushButton('Move Gripper\n[0 100]', self)
+        self.Gripbutton = PyQt4.QtGui.QPushButton('Gripper\n[0 100]', self)
 
         self.Gripbutton.setToolTip('Close Grippers')
-        self.Gripbutton.resize(180,80)
+        self.Gripbutton.resize(90,80)
         self.Gripbutton.move(20, 380)  
         self.Gripbutton.clicked.connect(self.moveGripper)
 
@@ -145,6 +145,12 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.Estop.resize(200,180)
         self.Estop.move(230, 280)  
         self.Estop.clicked.connect(self.stopMotion)
+
+        self.vScale = PyQt4.QtGui.QPushButton('Vel. Scale\n[0.1 5]', self)
+        self.vScale.setToolTip('Choose % default speed to move')
+        self.vScale.resize(90,80)
+        self.vScale.move(120, 380)  
+        self.vScale.clicked.connect(self.velScale)
 
 
     def init_labels(self):
@@ -207,10 +213,6 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
 
         inputZLab = PyQt4.QtGui.QLabel('J7',self)
         inputZLab.move(20,200)
-        inputZLab.resize(60,30)
-
-        inputZLab = PyQt4.QtGui.QLabel('Gripper',self)
-        inputZLab.move(55,340)
         inputZLab.resize(60,30)
 
         inputRXLab = PyQt4.QtGui.QLabel('RotX',self)
@@ -289,7 +291,7 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.inputR7.resize(60,30)
 
         self.inputRG = PyQt4.QtGui.QLineEdit(self)
-        self.inputRG.move(110,340)
+        self.inputRG.move(37,340)
         self.inputRG.resize(60,30)
 
         self.currentR1 = PyQt4.QtGui.QLineEdit(self)
@@ -343,6 +345,10 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         self.currentRotZ = PyQt4.QtGui.QLineEdit(self)
         self.currentRotZ.move(50+90+90+90+25,180)
         self.currentRotZ.resize(60,30)
+
+        self.velocityScale = PyQt4.QtGui.QLineEdit(self)
+        self.velocityScale.move(133,340)
+        self.velocityScale.resize(60,30)
 
 
     def commandJF(self):
@@ -480,6 +486,16 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
 
     def _stopMotion(self):
         self.action.stopMotion()
+
+    def velScale(self):
+    # change the velocity scale for the robot's motion
+        scale = float(self.velocityScale.text())
+        if scale > 5:
+            scale = 5
+        if scale < 0.1:
+            scale = 0.1
+
+        self.action.changeVelocityScaling(scale)
 
 
 if __name__ == "__main__":

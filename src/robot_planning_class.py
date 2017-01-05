@@ -35,7 +35,7 @@ class CytonMotion():
         self.traj_canceller = rospy.Publisher(
                 '/cyton_joint_trajectory_action_controller/follow_joint_trajectory/cancel',
                 GoalID,queue_size=10)
-        self.velScale = 0.01
+        self.velScale = 1
 
 
     def visualize(self,plan):
@@ -72,13 +72,18 @@ class CytonMotion():
         wpose.position.z = pose[2]
         waypoints.append(copy.deepcopy(wpose))
 
+        # plan
         (plan, fraction) = self.group.compute_cartesian_path(
                              waypoints,   # waypoints to follow
                              0.01,        # eef_step
                              0.0)         # jump_threshold
 
+        # control the velocity
+        plan = self.timeParamzn(plan, True)
+
         try:
             if execute:
+                # execute path
                 self.group.execute(plan, wait=False)
             else:
                 self.stored_plan = plan
@@ -109,13 +114,18 @@ class CytonMotion():
         wpose.position.z = pose[2]
         waypoints.append(copy.deepcopy(wpose))
 
+        # plan
         (plan, fraction) = self.group.compute_cartesian_path(
                              waypoints,   # waypoints to follow
                              0.01,        # eef_step
                              0.0)         # jump_threshold
 
+        # control the velocity
+        plan = self.timeParamzn(plan, True)
+
         try:
             if execute:
+                # execute path
                 self.group.execute(plan, wait=False)
             else:
                 self.stored_plan = plan
@@ -156,10 +166,13 @@ class CytonMotion():
             self.group.set_pose_target(pose_target)
 
         try:
+            # plan and velocity control
             plan = self.group.plan()
+            plan = self.timeParamzn(plan)
 
             if execute:
-                self.group.go(plan, wait=False)
+                # execute
+                self.group.execute(plan, wait=False)
             else:
                 self.stored_plan = plan
         except:
@@ -199,9 +212,13 @@ class CytonMotion():
             self.group.set_pose_target(pose_target)
 
         try:
+            # plan and velocity control
             plan = self.group.plan()
+            plan = self.timeParamzn(plan)
+
             if execute:
-                self.group.go(plan, wait=False)
+                # execute
+                self.group.execute(plan, wait=False)
             else:
                 self.stored_plan = plan
         except:
@@ -217,59 +234,68 @@ class CytonMotion():
     def moveGripper(self, move):
         #publish command to gripper to move [-.5 1.9]
 
-        self.grvelScaleipper_publisher.publish(move)
+        self.gripper_publisher.publish(move)
 
 
     def stopMotion(self):
         #stops robot motion in execution
+
         msg = GoalID()
         self.traj_canceller.publish(msg)
 
    
-    def timeParamzn(self, plan):
+    def timeParamzn(self, plan, cart=False):
+    #paramaterize time based on a velocity scaling factor
 
-     new_traj = moveit_msgs.msg.RobotTrajectory()
-     new_traj.joint_trajectory = plan.joint_trajectory
-     n_joints = len(plan.joint_trajectory.joint_names)
-     n_points = len(plan.joint_trajectory.points)
+        new_traj = moveit_msgs.msg.RobotTrajectory()
+        new_traj.joint_trajectory = plan.joint_trajectory
+        n_joints = len(plan.joint_trajectory.joint_names)
+        n_points = len(plan.joint_trajectory.points)
 
-     spd = self.velScale
+        spd = self.velScale
+        print spd
 
-     for i in range(n_points):
-         new_traj.joint_trajectory.points[i].time_from_start = \
-              plan.joint_trajectory.points[i].time_from_start / spd
+        for i in range(n_points):
+            new_traj.joint_trajectory.points[i].time_from_start = \
+                plan.joint_trajectory.points[i].time_from_start / spd
 
-         new_traj.joint_trajectory.points[i].velocities = \
-            list(new_traj.joint_trajectory.points[i].velocities)
+            if (cart and i==n_points-1):
+                return new_traj   
 
-         new_traj.joint_trajectory.points[i].accelerations = \
-             list(new_traj.joint_trajectory.points[i].accelerations)
+        for i in range(n_points):
 
-         new_traj.joint_trajectory.points[i].positions = \
-             list(new_traj.joint_trajectory.points[i].positions)
+            new_traj.joint_trajectory.points[i].velocities = \
+                list(new_traj.joint_trajectory.points[i].velocities)
 
-         for j in range(n_joints):
+            new_traj.joint_trajectory.points[i].accelerations = \
+                list(new_traj.joint_trajectory.points[i].accelerations)
 
-            new_traj.joint_trajectory.points[i].velocities[j] = \
-                plan.joint_trajectory.points[i].velocities[j] * spd
-            new_traj.joint_trajectory.points[i].accelerations[j] = \
-                plan.joint_trajectory.points[i].accelerations[j] * spd * spd
-            new_traj.joint_trajectory.points[i].positions[j] = \
-                plan.joint_trajectory.points[i].positions[j]
+            new_traj.joint_trajectory.points[i].positions = \
+                list(new_traj.joint_trajectory.points[i].positions)
 
-         new_traj.joint_trajectory.points[i].velocities = \
-             tuple(new_traj.joint_trajectory.points[i].velocities)
+            for j in range(n_joints):
 
-         new_traj.joint_trajectory.points[i].accelerations = \
-             tuple(new_traj.joint_trajectory.points[i].accelerations)
+                new_traj.joint_trajectory.points[i].velocities[j] = \
+                    plan.joint_trajectory.points[i].velocities[j] * spd
+                new_traj.joint_trajectory.points[i].accelerations[j] = \
+                    plan.joint_trajectory.points[i].accelerations[j] * spd * spd
+                new_traj.joint_trajectory.points[i].positions[j] = \
+                    plan.joint_trajectory.points[i].positions[j]
 
-         new_traj.joint_trajectory.points[i].positions = \
-             tuple(new_traj.joint_trajectory.points[i].positions)
+            new_traj.joint_trajectory.points[i].velocities = \
+                tuple(new_traj.joint_trajectory.points[i].velocities)
 
-     return new_traj
+            new_traj.joint_trajectory.points[i].accelerations = \
+                tuple(new_traj.joint_trajectory.points[i].accelerations)
+
+            new_traj.joint_trajectory.points[i].positions = \
+                tuple(new_traj.joint_trajectory.points[i].positions)
+
+        return new_traj
 
 
     def changeVelocityScaling(self, velScale):
+        #change the velocity scaling values from front-end
         self.velScale = velScale
 
 
