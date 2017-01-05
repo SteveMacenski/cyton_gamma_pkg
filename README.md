@@ -40,3 +40,5 @@ test_traj.py shows how to fill out the trajectory_msgs JointTrajectory type in p
 ## Robot Operations
 For full instructions see SteveMacenski/cyton_gamma_300-1500_operation_and_simulation
 https://github.com/SteveMacenski/cyton_gamma_300-1500_operation_and_simulation
+
+Video details of robot operations and initial front-end: https://www.youtube.com/watch?v=L6wQS88PJ5U
