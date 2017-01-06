@@ -75,9 +75,6 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
 
         self.action = robot_planning_class.CytonMotion()
 
-        #p = Process(target=feedback, args=(self,))
-        #p.start()
-        #p.run()
         t = feedback(self)
         t.state_info.connect(self.state_writer)
         t.start()
