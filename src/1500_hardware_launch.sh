@@ -29,6 +29,6 @@ sleep 20
 
 echo "[5/5] start combined front end"
 
-xterm -e python /home/rdtintern/catkin_ws/src/cyton_gamma_pkg/src/combined_front_end.py 2> /dev/null 1500 &
+xterm -e rosrun cyton_gamma_pkg combined_front_end.py 2> /dev/null 1500 &
 
 echo "ready!"
