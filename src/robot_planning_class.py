@@ -139,10 +139,10 @@ class CytonMotion():
 
         self.group.clear_pose_targets()
 
-        if len(angles) > 5:
+        try:
             #get
             group_variable_values = \
-                   self.group.get_current_joint_values()
+             self.group.get_current_joint_values()
 
             #set
             for i in range(self.num_joints):
@@ -151,15 +151,8 @@ class CytonMotion():
             self.group.set_joint_value_target(
                         group_variable_values)
 
-        else:
-
-            #sets
-            pose_target = geometry_msgs.msg.Pose()
-            pose_target.orientation.w = angles[0]
-            pose_target.position.x = angles[1]
-            pose_target.position.y = angles[2]
-            pose_target.position.z = angles[3]
-            self.group.set_pose_target(pose_target)
+        except:
+            print "cannot set angles"
 
         try:
             # plan and velocity control
@@ -180,7 +173,7 @@ class CytonMotion():
 
         self.group.clear_pose_targets()
 
-        if len(angles) > 5:
+        try:
             #get
             group_variable_values = \
              self.group.get_current_joint_values()
@@ -192,15 +185,8 @@ class CytonMotion():
             self.group.set_joint_value_target(
                         group_variable_values)
 
-        else:
-
-            #sets
-            pose_target = geometry_msgs.msg.Pose()
-            pose_target.orientation.w = angles[0]
-            pose_target.position.x += angles[1]
-            pose_target.position.y += angles[2]
-            pose_target.position.z += angles[3]
-            self.group.set_pose_target(pose_target)
+        except:
+            print "cannot set angles"
 
         try:
             # plan and velocity control
