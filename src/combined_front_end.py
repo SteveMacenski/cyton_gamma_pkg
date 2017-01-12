@@ -459,13 +459,26 @@ class CommandCenter(PyQt4.QtGui.QMainWindow):
         pose = info[1]
         Euler = info[2]
 
-        self.currentR1.setText(str(round(degrees(states[4]),2)))
-        self.currentR2.setText(str(round(degrees(states[0]),2)))
-        self.currentR3.setText(str(round(degrees(states[6]),2)))
-        self.currentR4.setText(str(round(degrees(states[5]),2)))
-        self.currentR5.setText(str(round(degrees(states[3]),2)))
-        self.currentR6.setText(str(round(degrees(states[1]),2)))
-        self.currentR7.setText(str(round(degrees(states[2]),2)))
+        if self.rob == '1500':
+            #ordering of joints recieved for 300 and 1500
+
+            self.currentR1.setText(str(round(degrees(states[4]),2)))
+            self.currentR2.setText(str(round(degrees(states[0]),2)))
+            self.currentR3.setText(str(round(degrees(states[6]),2)))
+            self.currentR4.setText(str(round(degrees(states[5]),2)))
+            self.currentR5.setText(str(round(degrees(states[3]),2)))
+            self.currentR6.setText(str(round(degrees(states[1]),2)))
+            self.currentR7.setText(str(round(degrees(states[2]),2)))
+
+        else:
+  
+            self.currentR1.setText(str(round(degrees(states[5]),2)))
+            self.currentR2.setText(str(round(degrees(states[0]),2)))
+            self.currentR3.setText(str(round(degrees(states[4]),2)))
+            self.currentR4.setText(str(round(degrees(states[6]),2)))
+            self.currentR5.setText(str(round(degrees(states[3]),2)))
+            self.currentR6.setText(str(round(degrees(states[1]),2)))
+            self.currentR7.setText(str(round(degrees(states[2]),2)))
 
         self.currentX.setText(str(round(pose.position.x,2)))
         self.currentY.setText(str(round(pose.position.y,2)))
