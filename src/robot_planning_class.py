@@ -26,6 +26,7 @@ class CytonMotion():
         self.group.set_goal_position_tolerance(0.001)
         self.group.set_goal_orientation_tolerance(0.01)
         self.group.allow_replanning(True)
+        self.num_joints = len(self.group.get_active_joints())
         self.display_trajectory_publisher = rospy.Publisher(
                 '/move_group/display_planned_path',
                 moveit_msgs.msg.DisplayTrajectory,queue_size=10)
@@ -144,13 +145,8 @@ class CytonMotion():
                    self.group.get_current_joint_values()
 
             #set
-            group_variable_values[0] = angles[0]
-            group_variable_values[1] = angles[1]
-            group_variable_values[2] = angles[2]
-            group_variable_values[3] = angles[3]
-            group_variable_values[4] = angles[4]
-            group_variable_values[5] = angles[5]
-            group_variable_values[6] = angles[6]
+            for i in range(self.num_joints):
+                group_variable_values[i] = angles[i]
 
             self.group.set_joint_value_target(
                         group_variable_values)
@@ -190,13 +186,8 @@ class CytonMotion():
              self.group.get_current_joint_values()
 
             #set
-            group_variable_values[0] += angles[0]
-            group_variable_values[1] += angles[1]
-            group_variable_values[2] += angles[2]
-            group_variable_values[3] += angles[3]
-            group_variable_values[4] += angles[4]
-            group_variable_values[5] += angles[5]
-            group_variable_values[6] += angles[6]
+            for i in range(self.num_joints):
+                group_variable_values[i] = angles[i]
 
             self.group.set_joint_value_target(
                         group_variable_values)
@@ -253,7 +244,6 @@ class CytonMotion():
         n_points = len(plan.joint_trajectory.points)
 
         spd = self.velScale
-        print spd
 
         for i in range(n_points):
             new_traj.joint_trajectory.points[i].time_from_start = \
