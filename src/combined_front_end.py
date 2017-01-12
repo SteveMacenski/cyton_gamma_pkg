@@ -16,6 +16,11 @@ import robot_planning_class
 import threading
 
 
+#scale # of Jspace buttons appear via a loop =+ 30 or whatever
+#TODO
+#scale the rest of the space for the delta etc to be evenly spaced
+#in remaining space
+
 class feedback(PyQt4.QtCore.QThread):
 
     state_info = PyQt4.QtCore.pyqtSignal(list, name="state_info")
