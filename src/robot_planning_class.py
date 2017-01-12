@@ -13,6 +13,11 @@ import tf
 from math import degrees, radians
 from actionlib_msgs.msg import GoalID
 
+#take commandline or launch file param for mainpulation group
+#and gripper gorups
+#TODO
+#change to gripper group for release version
+
 class CytonMotion():
 
     def __init__(self):
